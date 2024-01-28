@@ -1,0 +1,35 @@
+rootProject.name = 'playqd-upnp-server'
+
+dependencyResolutionManagement {
+    versionCatalogs {
+        libs {
+            version('lombok', '1.18.30')
+            version('mysqlConnector', '8.0.33')
+            version('flywaydb', '10.4.1')
+            version('springDocOpenApi', '2.3.0')
+            version('junitJupiter', '5.10.1')
+            version('junitPlatform', '1.10.1')
+
+            version('playqd-commons', '0.0.2')
+
+            library('lombok', 'org.projectlombok', 'lombok').versionRef('lombok')
+            library('mysql', 'mysql', 'mysql-connector-java').versionRef('mysqlConnector')
+            library('flyway-db', 'org.flywaydb', 'flyway-core').versionRef('flywaydb')
+            library('flyway-mysql', 'org.flywaydb', 'flyway-mysql').versionRef('flywaydb')
+
+            library('spring-doc-openapi', 'org.springdoc', 'springdoc-openapi-starter-webmvc-ui').versionRef('springDocOpenApi')
+            library('spring-cloud-eureka-client', 'org.springframework.cloud', 'spring-cloud-starter-netflix-eureka-client').withoutVersion()
+            library('spring-cloud-openfeign', 'org.springframework.cloud', 'spring-cloud-starter-openfeign').withoutVersion()
+
+            library('playqd-utils', 'io.playqd.commons', 'playqd-utils').versionRef('playqd-commons')
+            library('playqd-data', 'io.playqd.commons', 'playqd-data').versionRef('playqd-commons')
+            library('playqd-media-library-client', 'io.playqd.commons', 'playqd-media-library-client').versionRef('playqd-commons')
+
+            library('junit-platform-commons', 'org.junit.platform', 'junit-platform-commons').versionRef('junitPlatform')
+            library('junit-platform-engine', 'org.junit.platform', 'junit-platform-engine').versionRef('junitPlatform')
+            library('junit-platform-launcher', 'org.junit.platform', 'junit-platform-launcher').versionRef('junitPlatform')
+            library('junit-jupiter-engine', 'org.junit.jupiter', 'junit-jupiter-engine').versionRef('junitJupiter')
+            library('junit-jupiter-api', 'org.junit.jupiter', 'junit-jupiter-api').versionRef('junitJupiter')
+        }
+    }
+}

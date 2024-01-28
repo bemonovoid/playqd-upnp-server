@@ -1,0 +1,194 @@
+buildscript {
+    ext {
+        flywayVersion = '9.16.1'
+        commonsIoVersion = "2.11.0"
+        tikaVersion = '2.8.0'
+        fasterXmlVersion = "2.15.3"
+        jAudioTaggerVersion = '3.0.1'
+
+        ehcacheVersion = '3.10.8'
+        springDependencyVersion = '1.1.0'
+        springCloudVersion = '2023.0.0'
+        springBootVersion = '3.2.0'
+        wsdl4jVersion = '1.6.3'
+        jUpnpVersion = '2.7.1'
+        micrometerPrometheusVersion = '1.11.3'
+
+        mockitoVersion = '5.5.0'
+        h2Version = '2.2.222'
+    }
+}
+
+plugins {
+    id 'java'
+//    id 'jacoco'
+    id 'org.springframework.boot' version "${springBootVersion}"
+    id "io.spring.dependency-management" version "${springDependencyVersion}"
+    id "com.gorylenko.gradle-git-properties" version "2.4.1"
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+apply plugin: 'java'
+apply plugin: 'java-library'
+apply plugin: 'io.spring.dependency-management'
+
+configurations {
+    jaxb
+}
+
+dependencyManagement {
+    imports {
+        mavenBom("org.springframework.boot:spring-boot-dependencies:${springBootVersion}")
+        mavenBom("org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}")
+    }
+}
+
+dependencies {
+
+    jaxb "org.glassfish.jaxb:jaxb-xjc:4.0.2"
+    jaxb "org.glassfish.jaxb:jaxb-runtime:4.0.2"
+
+    implementation "wsdl4j:wsdl4j:${wsdl4jVersion}"
+
+    implementation"javax.xml.bind:jaxb-api:2.4.0-b180830.0359"
+    implementation "javax.activation:javax.activation-api:1.2.0"
+
+    implementation "org.jupnp:org.jupnp:${jUpnpVersion}"
+    implementation "org.jupnp:org.jupnp.support:${jUpnpVersion}"
+
+    implementation "commons-io:commons-io:${commonsIoVersion}"
+    implementation "org.apache.tika:tika-core:${tikaVersion}"
+
+    implementation "net.jthink:jaudiotagger:${jAudioTaggerVersion}"
+    implementation "org.ehcache:ehcache:${ehcacheVersion}"
+
+    implementation "org.flywaydb:flyway-core:${flywayVersion}"
+    implementation "org.flywaydb:flyway-mysql:${flywayVersion}"
+
+    implementation "com.fasterxml.jackson.module:jackson-module-jaxb-annotations:${fasterXmlVersion}"
+    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:${fasterXmlVersion}"
+
+    implementation "org.springframework.boot:spring-boot-starter-validation:${springBootVersion}"
+    implementation "org.springframework.boot:spring-boot-starter-data-jdbc:${springBootVersion}"
+    implementation "org.springframework.boot:spring-boot-starter-data-jpa:${springBootVersion}"
+    implementation "org.springframework.boot:spring-boot-starter-cache:${springBootVersion}"
+    implementation "org.springframework.boot:spring-boot-starter-actuator:${springBootVersion}"
+    implementation "org.springframework.boot:spring-boot-starter-web:${springBootVersion}"
+    implementation "org.springframework.boot:spring-boot-starter-logging:${springBootVersion}"
+    implementation "org.springframework.boot:spring-boot-starter-web-services:${springBootVersion}"
+    implementation "org.springframework.boot:spring-boot-starter-freemarker:${springBootVersion}"
+
+    implementation "io.micrometer:micrometer-registry-prometheus:${micrometerPrometheusVersion}"
+
+
+//    implementation "org.springframework.cloud:spring-cloud-starter-netflix-eureka-client"
+
+    implementation('org.yaml:snakeyaml') {
+        version {
+            strictly '2.0'
+        }
+    }
+
+    compileOnly libs.lombok
+    annotationProcessor libs.lombok
+
+    runtimeOnly libs.mysql
+
+    implementation libs.spring.cloud.eureka.client
+    implementation libs.spring.cloud.openfeign
+
+    implementation libs.spring.doc.openapi
+
+    implementation libs.playqd.utils
+    implementation libs.playqd.data
+    implementation libs.playqd.media.library.client
+
+    testCompileOnly libs.lombok
+    testAnnotationProcessor libs.lombok
+
+    testImplementation libs.junit.platform.commons
+    testRuntimeOnly libs.junit.platform.engine
+    testRuntimeOnly libs.junit.platform.launcher
+    testImplementation libs.junit.jupiter.api
+    testImplementation libs.junit.jupiter.engine
+
+    testImplementation("org.mockito:mockito-core:${mockitoVersion}")
+
+    testImplementation "com.h2database:h2:${h2Version}"
+    testImplementation "org.springframework.boot:spring-boot-starter-test:${springBootVersion}"
+}
+
+jar {
+    enabled = true
+}
+
+bootJar {
+    archiveBaseName = 'playqd-media-server'
+    mainClass = 'io.playqd.mediaserver.Application'
+}
+
+springBoot {
+    buildInfo()
+}
+
+//jib {
+//    allowInsecureRegistries = 'true'
+//    from {
+//        image = 'openjdk:17-slim'
+//    }
+//    to {
+//        image = 'playqd-media-server'
+//        tags = ['0.0.1']
+//    }
+//    container {
+//        mainClass = 'io.playqd.mediaserver.Application'
+//        ports = ["8081"]
+////        workingDirectory = '/playqd'
+////        volumes = ["/playqd"]
+//        creationTime = "USE_CURRENT_TIMESTAMP"
+//        environment = [SPRING_PROFILES_ACTIVE: "docker"]
+//    }
+//}
+
+test {
+    useJUnitPlatform()
+}
+
+//jacocoTestReport {
+//    dependsOn test
+//    reports {
+//        xml.required = true
+//        csv.required = false
+//    }
+//}
+
+//sourceSets {
+//    main {
+//        java {
+//            srcDir 'src/main/java'
+//        }
+//    }
+//}
+
+tasks.register('genJaxb') {
+    ext.sourcesDir = "${projectDir}/src/main/java"
+
+    outputs.dir sourcesDir
+
+    doLast() {
+        project.ant {
+            taskdef name: "xjc", classname: "com.sun.tools.xjc.XJCTask", classpath: configurations.jaxb.asPath
+            mkdir(dir: sourcesDir)
+
+            xjc(destdir: sourcesDir) {
+                arg(value: "-wsdl")
+                produces(dir: sourcesDir, includes: "**/*.java")
+                schema(dir: 'src/main/resources/schemas/my', includes: "**/*.xsd")
+            }
+        }
+    }
+}
