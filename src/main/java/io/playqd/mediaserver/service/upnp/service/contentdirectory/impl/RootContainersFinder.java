@@ -1,6 +1,6 @@
 package io.playqd.mediaserver.service.upnp.service.contentdirectory.impl;
 
-import io.playqd.mediaserver.client.MetadataClient;
+import io.playqd.commons.client.MediaLibraryClient;
 import io.playqd.mediaserver.model.BrowsableObject;
 import io.playqd.mediaserver.persistence.jpa.dao.BrowseResult;
 import io.playqd.mediaserver.service.upnp.service.contentdirectory.BrowseContext;
@@ -16,10 +16,10 @@ import java.util.List;
 @Component
 final class RootContainersFinder implements ObjectBrowser {
 
-    private final MetadataClient metadataClient;
+    private final MediaLibraryClient mediaLibraryClient;
 
-    RootContainersFinder(MetadataClient metadataClient) {
-        this.metadataClient = metadataClient;
+    RootContainersFinder(MediaLibraryClient mediaLibraryClient) {
+        this.mediaLibraryClient = mediaLibraryClient;
     }
 
     @Override
@@ -29,7 +29,7 @@ final class RootContainersFinder implements ObjectBrowser {
     }
 
     private BrowsableObject buildFoldersRoot() {
-        var count = metadataClient.getMusicDirectories().size();
+        var count = mediaLibraryClient.musicDirectories().size();
         return BrowsableObjectImpl.builder()
                 .objectId(SystemContainerName.ROOT_FOLDERS.getObjectId())
                 .parentObjectId("-1")

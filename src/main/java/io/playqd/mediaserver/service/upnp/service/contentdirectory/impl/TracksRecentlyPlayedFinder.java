@@ -1,7 +1,8 @@
 package io.playqd.mediaserver.service.upnp.service.contentdirectory.impl;
 
+import io.playqd.commons.client.MediaLibraryClient;
+import io.playqd.commons.client.request.Sorting;
 import io.playqd.commons.data.Track;
-import io.playqd.mediaserver.client.MetadataClient;
 import io.playqd.mediaserver.config.properties.PlayqdProperties;
 import io.playqd.mediaserver.service.upnp.service.contentdirectory.BrowseContext;
 import io.playqd.mediaserver.service.upnp.service.contentdirectory.ObjectIdPattern;
@@ -9,15 +10,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
 final class TracksRecentlyPlayedFinder extends AbstractTracksFinder {
 
-    TracksRecentlyPlayedFinder(PlayqdProperties playqdProperties, MetadataClient metadataClient) {
-        super(playqdProperties, metadataClient);
+    TracksRecentlyPlayedFinder(PlayqdProperties playqdProperties, MediaLibraryClient mediaLibraryClient) {
+        super(playqdProperties, mediaLibraryClient);
     }
 
     @Override
@@ -27,9 +27,9 @@ final class TracksRecentlyPlayedFinder extends AbstractTracksFinder {
 
     @Override
     protected Page<Track> findAudioFiles(BrowseContext context, Pageable pageable) {
-        var sort = Sort.by("fileLastPlaybackDate").descending();
+        var sort = Sorting.Tracks.BY_FILE_LAST_PLAYED_DATE_DESC;
         var sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
-        return metadataClient.getPlayedTracks(sortedPageable);
+        return mediaLibraryClient.tracksRecentlyPlayed(sortedPageable);
     }
 
     @Override
@@ -42,5 +42,4 @@ final class TracksRecentlyPlayedFinder extends AbstractTracksFinder {
     protected String getDcTitle(BrowseContext context, Track track) {
         return track.artist().name() + " - " + super.getDcTitle(context, track);
     }
-
 }

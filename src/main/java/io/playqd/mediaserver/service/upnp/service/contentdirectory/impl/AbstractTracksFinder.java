@@ -1,7 +1,7 @@
 package io.playqd.mediaserver.service.upnp.service.contentdirectory.impl;
 
+import io.playqd.commons.client.MediaLibraryClient;
 import io.playqd.commons.data.Track;
-import io.playqd.mediaserver.client.MetadataClient;
 import io.playqd.mediaserver.config.properties.PlayqdProperties;
 import io.playqd.mediaserver.model.BrowsableObject;
 import io.playqd.mediaserver.persistence.jpa.dao.BrowseResult;
@@ -30,11 +30,11 @@ import java.util.function.Supplier;
 @Slf4j
 abstract class AbstractTracksFinder extends BrowsableObjectBuilder implements ObjectBrowser {
 
-    protected final MetadataClient metadataClient;
+    protected final MediaLibraryClient mediaLibraryClient;
     protected final PlayqdProperties playqdProperties;
 
-    AbstractTracksFinder(PlayqdProperties playqdProperties, MetadataClient metadataClient) {
-        this.metadataClient = metadataClient;
+    AbstractTracksFinder(PlayqdProperties playqdProperties, MediaLibraryClient mediaLibraryClient) {
+        this.mediaLibraryClient = mediaLibraryClient;
         this.playqdProperties = playqdProperties;
     }
 

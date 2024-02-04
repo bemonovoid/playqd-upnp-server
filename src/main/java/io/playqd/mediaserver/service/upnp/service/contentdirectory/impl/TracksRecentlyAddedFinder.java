@@ -1,12 +1,14 @@
 package io.playqd.mediaserver.service.upnp.service.contentdirectory.impl;
 
+import io.playqd.commons.client.MediaLibraryClient;
+import io.playqd.commons.client.request.Sorting;
 import io.playqd.commons.data.Track;
-import io.playqd.mediaserver.client.MetadataClient;
 import io.playqd.mediaserver.config.properties.PlayqdProperties;
 import io.playqd.mediaserver.service.upnp.service.contentdirectory.BrowseContext;
 import io.playqd.mediaserver.service.upnp.service.contentdirectory.ObjectIdPattern;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
@@ -14,8 +16,8 @@ import org.springframework.stereotype.Component;
 @Component
 final class TracksRecentlyAddedFinder extends AbstractTracksFinder {
 
-    TracksRecentlyAddedFinder(PlayqdProperties playqdProperties, MetadataClient metadataClient) {
-        super(playqdProperties, metadataClient);
+    TracksRecentlyAddedFinder(PlayqdProperties playqdProperties, MediaLibraryClient mediaLibraryClient) {
+        super(playqdProperties, mediaLibraryClient);
     }
 
     @Override
@@ -26,7 +28,11 @@ final class TracksRecentlyAddedFinder extends AbstractTracksFinder {
 
     @Override
     protected Page<Track> findAudioFiles(BrowseContext context, Pageable pageable) {
-        return metadataClient.getRecentlyAdded(pageable);
+        var sortedPageable = PageRequest.of(
+            pageable.getPageNumber(),
+            pageable.getPageSize(),
+            Sorting.Tracks.BY_FILE_ADDED_TO_WATCH_FOLDER_DATE_DESC);
+        return mediaLibraryClient.tracksLastRecentlyAdded(sortedPageable);
     }
 
     @Override

@@ -2,9 +2,10 @@ package io.playqd.mediaserver.config;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import feign.codec.Decoder;
 import feign.optionals.OptionalDecoder;
-import io.playqd.commons.client.metadata.MediaLibraryClient;
+import io.playqd.commons.client.MediaLibraryClient;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
@@ -40,6 +41,7 @@ class PlayqdClientsConfiguration {
     return new ObjectMapper()
         .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
 //        .setPropertyNamingStrategy(SnakeCaseStrategy.SNAKE_CASE)
+        .registerModule(new JavaTimeModule())
         .registerModule(new PageJacksonModule())
         .registerModule(new SortJacksonModule());
   }

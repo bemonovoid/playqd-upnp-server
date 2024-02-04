@@ -1,7 +1,7 @@
 package io.playqd.mediaserver.service.upnp.service.contentdirectory.impl;
 
+import io.playqd.commons.client.MediaLibraryClient;
 import io.playqd.commons.data.Track;
-import io.playqd.mediaserver.client.MetadataClient;
 import io.playqd.mediaserver.config.properties.PlayqdProperties;
 import io.playqd.mediaserver.service.upnp.service.contentdirectory.BrowseContext;
 import io.playqd.mediaserver.service.upnp.service.contentdirectory.ObjectIdPattern;
@@ -14,8 +14,8 @@ import org.springframework.stereotype.Component;
 @Component
 final class TracksByArtistAlbumFinder extends AbstractTracksFinder {
 
-    TracksByArtistAlbumFinder(PlayqdProperties playqdProperties, MetadataClient metadataClient) {
-        super(playqdProperties, metadataClient);
+    TracksByArtistAlbumFinder(PlayqdProperties playqdProperties, MediaLibraryClient mediaLibraryClient) {
+        super(playqdProperties, mediaLibraryClient);
     }
 
     @Override
@@ -26,11 +26,10 @@ final class TracksByArtistAlbumFinder extends AbstractTracksFinder {
 
     @Override
     protected Page<Track> findAudioFiles(BrowseContext context, Pageable pageable) {
-        return metadataClient.getTracksByAlbumId(readAlbumId(context));
+        return mediaLibraryClient.tracksByAlbumId(pageable, readAlbumId(context));
     }
 
     private static String readAlbumId(BrowseContext context) {
         return context.getRequiredHeader(BrowseContext.HEADER_ALBUM_ID, String.class);
     }
-
 }

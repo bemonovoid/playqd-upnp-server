@@ -1,6 +1,6 @@
 package io.playqd.mediaserver.service.upnp.service.contentdirectory.impl;
 
-import io.playqd.commons.client.metadata.MediaLibraryClient;
+import io.playqd.commons.client.MediaLibraryClient;
 import io.playqd.commons.data.Artist;
 import io.playqd.mediaserver.model.BrowsableObject;
 import io.playqd.mediaserver.persistence.jpa.dao.BrowseResult;

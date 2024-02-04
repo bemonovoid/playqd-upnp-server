@@ -1,8 +1,8 @@
 package io.playqd.mediaserver.service.upnp.service.contentdirectory.impl;
 
+import io.playqd.commons.client.MediaLibraryClient;
 import io.playqd.commons.data.MusicDirectory;
 import io.playqd.mediaserver.api.soap.data.Browse;
-import io.playqd.mediaserver.client.MetadataClient;
 import io.playqd.mediaserver.model.BrowsableObject;
 import io.playqd.mediaserver.persistence.BrowsableObjectDao;
 import io.playqd.mediaserver.persistence.jpa.dao.BrowsableObjectSetter;
@@ -25,11 +25,11 @@ import java.util.function.Consumer;
 @Component
 final class MusicDirectoriesBrowser extends AbstractDirectoryBrowser {
 
-    private final MetadataClient metadataClient;
+    private final MediaLibraryClient mediaLibraryClient;
 
-    MusicDirectoriesBrowser(MetadataClient metadataClient, BrowsableObjectDao browsableObjectDao) {
+    MusicDirectoriesBrowser(MediaLibraryClient mediaLibraryClient, BrowsableObjectDao browsableObjectDao) {
         super(browsableObjectDao);
-        this.metadataClient = metadataClient;
+        this.mediaLibraryClient = mediaLibraryClient;
     }
 
     @Override
@@ -41,7 +41,7 @@ final class MusicDirectoriesBrowser extends AbstractDirectoryBrowser {
 
         if (objects.isEmpty()) {
 
-            var musicDirectories = metadataClient.getMusicDirectories();
+            var musicDirectories = mediaLibraryClient.musicDirectories();
 
             objects = musicDirectories.stream()
                     .filter(musicDirectory -> {

@@ -1,9 +1,8 @@
 package io.playqd.mediaserver.service.upnp.service.contentdirectory.impl;
 
+import io.playqd.commons.client.MediaLibraryClient;
 import io.playqd.commons.data.Artist;
 import io.playqd.mediaserver.api.soap.data.Browse;
-import io.playqd.mediaserver.client.MetadataClient;
-import io.playqd.mediaserver.client.model.ArtistsQueryParams;
 import io.playqd.mediaserver.model.BrowsableObject;
 import io.playqd.mediaserver.persistence.jpa.dao.BrowseResult;
 import io.playqd.mediaserver.service.upnp.service.contentdirectory.BrowseContext;
@@ -18,10 +17,10 @@ import org.springframework.stereotype.Component;
 @Component
 final class ArtistsByGenreFinder implements ObjectBrowser {
 
-    private final MetadataClient metadataClient;
+    private final MediaLibraryClient mediaLibraryClient;
 
-    ArtistsByGenreFinder(MetadataClient metadataClient) {
-        this.metadataClient = metadataClient;
+    ArtistsByGenreFinder(MediaLibraryClient mediaLibraryClient) {
+        this.mediaLibraryClient = mediaLibraryClient;
     }
 
     @Override
@@ -30,8 +29,7 @@ final class ArtistsByGenreFinder implements ObjectBrowser {
 
         var requestedCount = browseRequest.getRequestedCount();
 
-        var artistsQueryParams = ArtistsQueryParams.builder().genreId(readGenreId(context)).build();
-        var genreArtists = metadataClient.getArtists(artistsQueryParams, Pageable.ofSize(requestedCount));
+        var genreArtists = mediaLibraryClient.artistsByGenre(Pageable.ofSize(requestedCount), readGenreId(context));
         var result = genreArtists.map(artist -> buildBrowsableObject(context.getRequest(), artist)).toList();
         return new BrowseResult(result.size(), result.size(), result);
     }

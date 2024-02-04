@@ -78,7 +78,7 @@ class BrowseActionDelegateImpl implements BrowseActionDelegate {
                 return getResponse(TracksMostPlayedFinder.class, context);
             }
             case TRACKS_RECENTLY_ADDED -> {
-                return getResponse(TracksRecentlyAddedFinder.class, context);
+                return getResponse(TracksRecentlyAddedFinder.class, context); // TODO may be have a folder of 'Since {date}' or for example 3 recent dates/folders
             }
             case TRACKS_RECENTLY_PLAYED -> {
                 return getResponse(TracksRecentlyPlayedFinder.class, context);
@@ -131,5 +131,4 @@ class BrowseActionDelegateImpl implements BrowseActionDelegate {
     private BrowseResult getResponse(Class<? extends ObjectBrowser> objectFinderClass, BrowseContext context) {
         return beanFactory.getBean(objectFinderClass).browse(context);
     }
-
 }

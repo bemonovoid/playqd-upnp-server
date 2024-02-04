@@ -1,6 +1,6 @@
 package io.playqd.mediaserver.service.upnp.service.contentdirectory.impl;
 
-import io.playqd.commons.client.metadata.MediaLibraryClient;
+import io.playqd.commons.client.MediaLibraryClient;
 import io.playqd.commons.data.Track;
 import io.playqd.commons.utils.Tuple;
 import io.playqd.mediaserver.api.soap.data.Browse;
@@ -149,11 +149,12 @@ final class DirectoryBrowser extends AbstractDirectoryBrowser {
     }
     var locationToObjectMap = persistedObjects.stream()
         .collect(Collectors.toMap(obj -> obj.location().toString(), obj -> obj));
-
-    return mediaLibraryClient.tracks(Pageable.unpaged(), "", "", "", locationToObjectMap.keySet()).stream()
+    return mediaLibraryClient.tracksByLocationIn(Pageable.unpaged(), locationToObjectMap.keySet()).stream()
         .filter(track -> locationToObjectMap.containsKey(track.fileAttributes().location()))
         .map(track -> buildAudioTrackObjectItem(
-            browseRequest, track, locationToObjectMap.get(track.fileAttributes().location())))
+            browseRequest,
+            track,
+            locationToObjectMap.get(track.fileAttributes().location())))
         .toList();
   }
 
@@ -279,5 +280,4 @@ final class DirectoryBrowser extends AbstractDirectoryBrowser {
                 .build()))
         .build();
   }
-
 }

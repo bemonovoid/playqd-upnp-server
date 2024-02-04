@@ -1,9 +1,8 @@
 package io.playqd.mediaserver.service.upnp.service.contentdirectory.impl;
 
+import io.playqd.commons.client.MediaLibraryClient;
 import io.playqd.commons.data.Album;
 import io.playqd.mediaserver.api.soap.data.Browse;
-import io.playqd.mediaserver.client.MetadataClient;
-import io.playqd.mediaserver.client.model.AlbumsQueryParams;
 import io.playqd.mediaserver.model.BrowsableObject;
 import io.playqd.mediaserver.persistence.jpa.dao.BrowseResult;
 import io.playqd.mediaserver.service.upnp.service.contentdirectory.BrowseContext;
@@ -20,16 +19,15 @@ import org.springframework.stereotype.Component;
 @Component
 final class AlbumsByArtistFinder implements ObjectBrowser {
 
-    private final MetadataClient metadataClient;
+    private final MediaLibraryClient mediaLibraryClient;
 
-    AlbumsByArtistFinder(MetadataClient metadataClient) {
-        this.metadataClient = metadataClient;
+    AlbumsByArtistFinder(MediaLibraryClient mediaLibraryClient) {
+        this.mediaLibraryClient = mediaLibraryClient;
     }
 
     @Override
     public BrowseResult browse(BrowseContext context) {
-        var albumsQueryParams = AlbumsQueryParams.builder().artistId(readArtistId(context)).build();
-        var artistAlbums = metadataClient.getAlbums(albumsQueryParams, Pageable.unpaged());
+        var artistAlbums = mediaLibraryClient.albumsByArtistId(Pageable.unpaged(), readArtistId(context));
         var result = artistAlbums.stream()
                 .map(album -> buildBrowsableObject(context.getRequest(), album))
                 .toList();

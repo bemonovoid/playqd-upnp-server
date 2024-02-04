@@ -1,7 +1,7 @@
 package io.playqd.mediaserver.service.upnp.service.contentdirectory.impl;
 
+import io.playqd.commons.client.MediaLibraryClient;
 import io.playqd.commons.data.Genre;
-import io.playqd.mediaserver.client.MetadataClient;
 import io.playqd.mediaserver.model.BrowsableObject;
 import io.playqd.mediaserver.persistence.jpa.dao.BrowseResult;
 import io.playqd.mediaserver.service.upnp.service.contentdirectory.BrowseContext;
@@ -18,10 +18,10 @@ import org.springframework.stereotype.Component;
 @Slf4j
 final class GenresFinder implements ObjectBrowser {
 
-    private final MetadataClient metadataClient;
+    private final MediaLibraryClient mediaLibraryClient;
 
-    GenresFinder(MetadataClient metadataClient) {
-        this.metadataClient = metadataClient;
+    GenresFinder(MediaLibraryClient mediaLibraryClient) {
+        this.mediaLibraryClient = mediaLibraryClient;
     }
 
     @Override
@@ -34,7 +34,7 @@ final class GenresFinder implements ObjectBrowser {
         }
 
         log.info("Requesting first {} genres from starting index: 0", requestedCount);
-        var genres = metadataClient.getGenres(Pageable.ofSize(requestedCount));
+        var genres = mediaLibraryClient.getGenres(Pageable.ofSize(requestedCount));
         var result = genres.map(genre -> buildBrowsableObject(context, genre)).getContent();
         return new BrowseResult(genres.getTotalElements(), result.size(), result);
 //        var browseRequest = context.getRequest();

@@ -19,12 +19,12 @@ public class UpnpActionProperties {
     public static class BrowseActionProperties {
 
         @PositiveOrZero
-        private int maxDisplayedRecentlyAdded = 100;
+        private int maxDisplayedRecentlyAdded;
 
         @PositiveOrZero
-        private int maxDisplayedRecentlyPlayed = 100;
+        private int maxDisplayedRecentlyPlayed;
 
         @PositiveOrZero
-        private int maxDisplayedMostPlayed = 100;
+        private int maxDisplayedMostPlayed;
     }
 }
