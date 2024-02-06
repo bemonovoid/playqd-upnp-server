@@ -14,7 +14,6 @@ import java.util.Optional;
 @Setter(AccessLevel.PACKAGE)
 public class PlayqdProperties {
 
-    private static final String PLAYLISTS_DIR_NAME = "playlists";
     private static final String LOGS_DIR_NAME = "logs";
 
     private String workingDir;
@@ -37,9 +36,5 @@ public class PlayqdProperties {
 
     public Path getLogsDir() {
         return getWorkingDirOrDefault().resolve(LOGS_DIR_NAME);
-    }
-
-    public Path getPlaylistsDir() {
-        return getWorkingDirOrDefault().resolve(PLAYLISTS_DIR_NAME);
     }
 }

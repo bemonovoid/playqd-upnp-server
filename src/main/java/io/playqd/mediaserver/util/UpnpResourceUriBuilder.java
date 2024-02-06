@@ -9,6 +9,6 @@ public class UpnpResourceUriBuilder {
   }
 
   public static String forTrackAudioStreamObject(String metadataServerHostname, long trackId) {
-    return String.format("http://%s%s/%s", metadataServerHostname, RestApiResources.AUDIO_STREAM, trackId);
+    return String.format("%s%s/%s", metadataServerHostname, RestApiResources.AUDIO_STREAM, trackId);
   }
 }

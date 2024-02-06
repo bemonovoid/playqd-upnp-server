@@ -30,7 +30,7 @@ final class TracksMostPlayedFinder extends AbstractTracksFinder {
     protected Page<Track> findAudioFiles(BrowseContext context, Pageable pageable) {
         var sort = Sorting.Tracks.BY_PLAYBACK_COUNT_DESC;
         var sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
-        return mediaLibraryClient.tracks(sortedPageable, "", "", "", "", "", true, false, null, null);
+        return mediaLibraryClient.tracksRecentlyPlayed(sortedPageable);
     }
 
     @Override

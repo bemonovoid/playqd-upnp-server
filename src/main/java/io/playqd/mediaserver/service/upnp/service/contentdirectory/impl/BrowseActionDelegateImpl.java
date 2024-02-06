@@ -84,7 +84,7 @@ class BrowseActionDelegateImpl implements BrowseActionDelegate {
                 return getResponse(TracksRecentlyPlayedFinder.class, context);
             }
             case PLAYLISTS -> {
-                return getResponse(PlaylistFilesFinder.class, context);
+                return getResponse(PlaylistsFinder.class, context);
             }
             default -> throw new IllegalStateException(String.format("%s music library query not yet supported.",
                     systemContainerName.getDcTitleName()));
