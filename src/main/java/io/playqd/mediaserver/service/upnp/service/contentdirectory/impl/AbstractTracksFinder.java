@@ -1,6 +1,7 @@
 package io.playqd.mediaserver.service.upnp.service.contentdirectory.impl;
 
 import io.playqd.commons.client.MediaLibraryClient;
+import io.playqd.commons.data.ArtworkSize;
 import io.playqd.commons.data.Track;
 import io.playqd.mediaserver.config.properties.PlayqdProperties;
 import io.playqd.mediaserver.model.BrowsableObject;
@@ -13,16 +14,16 @@ import io.playqd.mediaserver.service.upnp.service.contentdirectory.ResTag;
 import io.playqd.mediaserver.service.upnp.service.contentdirectory.UpnpClass;
 import io.playqd.mediaserver.service.upnp.service.contentdirectory.UpnpTagValues;
 import io.playqd.mediaserver.util.DlnaUtils;
-import io.playqd.mediaserver.util.UpnpResourceUriBuilder;
+import io.playqd.mediaserver.util.MediaLibraryResourceUriBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.jupnp.support.model.ProtocolInfo;
 import org.jupnp.util.MimeType;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Supplier;
@@ -30,12 +31,14 @@ import java.util.function.Supplier;
 @Slf4j
 abstract class AbstractTracksFinder extends BrowsableObjectBuilder implements ObjectBrowser {
 
-    protected final MediaLibraryClient mediaLibraryClient;
-    protected final PlayqdProperties playqdProperties;
+    protected PlayqdProperties playqdProperties;
+    protected MediaLibraryClient mediaLibraryClient;
+    protected MediaLibraryResourceUriBuilder mediaLibraryResourceUriBuilder;
 
-    AbstractTracksFinder(PlayqdProperties playqdProperties, MediaLibraryClient mediaLibraryClient) {
-        this.mediaLibraryClient = mediaLibraryClient;
+    AbstractTracksFinder(PlayqdProperties playqdProperties,
+                         MediaLibraryClient mediaLibraryClient) {
         this.playqdProperties = playqdProperties;
+        this.mediaLibraryClient = mediaLibraryClient;
     }
 
     @Override
@@ -60,6 +63,11 @@ abstract class AbstractTracksFinder extends BrowsableObjectBuilder implements Ob
 
     protected int calculateRequestedCount(BrowseContext context) {
         return context.getRequest().getRequestedCount();
+    }
+
+    @Autowired
+    final void setMediaLibraryResourceUriBuilder(MediaLibraryResourceUriBuilder mediaLibraryResourceUriBuilder) {
+        this.mediaLibraryResourceUriBuilder = mediaLibraryResourceUriBuilder;
     }
 
     protected String getDcTitle(BrowseContext context, Track track) {
@@ -136,7 +144,8 @@ abstract class AbstractTracksFinder extends BrowsableObjectBuilder implements Ob
                 .upnpClass(UpnpClass.musicTrack)
                 .playbackCount(track.playback().count())
                 .lastPlaybackTime(UpnpTagValues.formatLastPlaybackTime(track).orElse(null))
-                .albumArtURI(track.album().artwork() != null ? track.album().artwork().uri() : null)
+                .albumArtURI(
+                    mediaLibraryResourceUriBuilder.getImageBinaryResourceForAlbum(track.album().id(), ArtworkSize.sm))
                 .build();
     }
 
@@ -152,7 +161,7 @@ abstract class AbstractTracksFinder extends BrowsableObjectBuilder implements Ob
     private ResTag buildAudioFileResource(Track track) {
         return ResTag.builder()
                 .id(Long.toString(track.id()))
-                .uri(UpnpResourceUriBuilder.forTrackAudioStreamObject(playqdProperties.getMetadataServerBaseUrl(), track.id()))
+                .uri(mediaLibraryResourceUriBuilder.getAudioStreamResourceForTrackId(track.uuid()))
                 .protocolInfo(new ProtocolInfo(MimeType.valueOf(track.audioFormat().mimeType())).toString())
                 .bitsPerSample(Integer.toString(track.audioFormat().bitsPerSample()))
                 .bitRate(track.audioFormat().bitRate())
@@ -163,27 +172,16 @@ abstract class AbstractTracksFinder extends BrowsableObjectBuilder implements Ob
     }
 
     private List<ResTag> buildAlbumArtRes(Track track) {
-        if (track.album().artwork() == null) {
-            return Collections.emptyList();
-        }
-        var artwork = track.album().artwork();
-        try {
-            var mimeType = MimeType.valueOf(artwork.mimeType());
-            return List.of(buildResTag(artwork));
-        } catch (IllegalArgumentException e) {
-            log.error("Unexpected error when reading the mime type of album art with id: {}", artwork.albumId(), e);
-            return Collections.emptyList();
-        }
+        return List.of(buildResTag(track));
     }
 
-    private static ResTag buildResTag(Track.Artwork artwork) {
+    private ResTag buildResTag(Track track) {
         return ResTag.builder()
-                .id(artwork.albumId())
-                .uri(artwork.uri())
-                .protocolInfo(DlnaUtils.buildImageProtocolInfo(MimeType.valueOf(artwork.mimeType())))
-                .size(String.valueOf(artwork.size()))
+                .id(track.album().id())
+                .uri(mediaLibraryResourceUriBuilder.getImageBinaryResourceForAlbum(track.album().id(), ArtworkSize.sm))
+                .protocolInfo(DlnaUtils.buildImageProtocolInfo(new MimeType()))
+                .size("")
                 .image(true)
                 .build();
     }
-
 }

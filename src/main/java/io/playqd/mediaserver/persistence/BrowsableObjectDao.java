@@ -11,20 +11,22 @@ import java.util.function.Consumer;
 
 public interface BrowsableObjectDao {
 
-    long countChildren(long parentId);
+  long countChildren(long parentId);
 
-    boolean hasChildren(long parentId);
+  boolean hasChildren(long parentId);
 
-    PersistedBrowsableObject getOne(long id);
+  PersistedBrowsableObject getOne(long id);
 
-    Optional<PersistedBrowsableObject> getOneByObjectId(String objectId);
+  PersistedBrowsableObject getChildRoot(PersistedBrowsableObject childObject);
 
-    List<PersistedBrowsableObject> getRoot();
+  Optional<PersistedBrowsableObject> getOneByObjectId(String objectId);
 
-    Page<PersistedBrowsableObject> getChildren(long parentId, PageRequest request);
+  List<PersistedBrowsableObject> getRoots();
 
-    PersistedBrowsableObject save(Consumer<BrowsableObjectSetter> consumer);
+  Page<PersistedBrowsableObject> getChildren(long parentId, PageRequest request);
 
-    PersistedBrowsableObject save(PersistedBrowsableObject parent,
-                                  List<Consumer<BrowsableObjectSetter>> children);
+  PersistedBrowsableObject save(Consumer<BrowsableObjectSetter> consumer);
+
+  PersistedBrowsableObject save(PersistedBrowsableObject parent,
+                                List<Consumer<BrowsableObjectSetter>> children);
 }

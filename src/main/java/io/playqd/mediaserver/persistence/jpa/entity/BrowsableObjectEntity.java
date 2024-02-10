@@ -2,7 +2,16 @@ package io.playqd.mediaserver.persistence.jpa.entity;
 
 import io.playqd.mediaserver.persistence.jpa.dao.BrowsableObjectSetter;
 import io.playqd.mediaserver.service.upnp.service.contentdirectory.UpnpClass;
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.Index;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,12 +28,14 @@ import java.util.List;
 })
 public class BrowsableObjectEntity extends PersistableAuditableEntity implements BrowsableObjectSetter {
 
-    static final String TABLE_NAME = "upnp_browsable_object";
+    public static final String TABLE_NAME = "upnp_browsable_object";
 
     private static final String COL_OBJECT_ID = "object_id";
     private static final String COL_TITLE = "title";
     private static final String COL_LOCATION = "location";
     private static final String COL_UPNP_CLASS = "upnp_class";
+    private static final String COL_MIME_TYPE = "mime_type";
+    private static final String COL_SIZE = "size";
     private static final String COL_PARENT_ID = "parent_id";
     private static final String COL_CHILD_COUNT = "child_count";
     private static final String COL_CHILD_CONTAINER_COUNT = "child_container_count";
@@ -41,6 +52,12 @@ public class BrowsableObjectEntity extends PersistableAuditableEntity implements
     @Column(name = COL_UPNP_CLASS, nullable = false)
     @Enumerated(EnumType.STRING)
     private UpnpClass upnpClass;
+
+    @Column(name = COL_MIME_TYPE)
+    private String mimeType;
+
+    @Column(name = COL_SIZE)
+    private Long size;
 
     @Column(name = COL_CHILD_COUNT)
     private long childCount;

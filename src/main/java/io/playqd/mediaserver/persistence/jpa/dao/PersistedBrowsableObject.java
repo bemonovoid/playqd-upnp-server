@@ -11,6 +11,11 @@ public record PersistedBrowsableObject(long id,
                                        String dcTitle,
                                        Path location,
                                        UpnpClass upnpClass,
+                                       String mimeType,
+                                       Long size,
                                        Supplier<Long> childCount,
                                        long childContainerCount) {
+  public boolean isRoot() {
+    return parentId == null;
+  }
 }

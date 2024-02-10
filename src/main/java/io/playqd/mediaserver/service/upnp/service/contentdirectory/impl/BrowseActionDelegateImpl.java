@@ -46,7 +46,7 @@ class BrowseActionDelegateImpl implements BrowseActionDelegate {
     }
 
     private BrowseResult browseMediaSources(BrowseContext context) {
-        return getResponse(MusicDirectoriesBrowser.class, context);
+        return getResponse(MusicDirectoriesFinder.class, context);
     }
 
     private BrowseResult browseMusicLibraryContainers(BrowseContext context) {
@@ -125,7 +125,7 @@ class BrowseActionDelegateImpl implements BrowseActionDelegate {
     }
 
     private BrowseResult browseMediaSourceContent(BrowseContext context) {
-        return getResponse(DirectoryBrowser.class, context);
+        return getResponse(DirectoryFinder.class, context);
     }
 
     private BrowseResult getResponse(Class<? extends ObjectBrowser> objectFinderClass, BrowseContext context) {

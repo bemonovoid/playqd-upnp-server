@@ -15,4 +15,8 @@ public interface BrowsableObjectSetter {
     void setDcTitle(String dcTitle);
 
     void setUpnpClass(UpnpClass upnpClass);
+
+    void setMimeType(String mimeType);
+
+    void setSize(Long size);
 }

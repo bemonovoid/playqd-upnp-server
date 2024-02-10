@@ -44,13 +44,23 @@ class JpaBrowsableObjectDao implements BrowsableObjectDao {
 
     @Override
     @Transactional(readOnly = true)
+    public PersistedBrowsableObject getChildRoot(PersistedBrowsableObject childObject) {
+        var browsableObject = childObject;
+        while (!browsableObject.isRoot()) {
+            browsableObject = getOne(browsableObject.parentId());
+        }
+        return browsableObject;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public Optional<PersistedBrowsableObject> getOneByObjectId(String objectId) {
         return repository.findByObjectId(objectId).map(JpaBrowsableObjectDao::fromEntity);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<PersistedBrowsableObject> getRoot() {
+    public List<PersistedBrowsableObject> getRoots() {
         return repository.findByParentIsNull().stream().map(JpaBrowsableObjectDao::fromEntity).toList();
     }
 
@@ -106,6 +116,8 @@ class JpaBrowsableObjectDao implements BrowsableObjectDao {
                 entity.getDcTitle(),
                 Paths.get(entity.getLocation()),
                 entity.getUpnpClass(),
+                entity.getMimeType(),
+                entity.getSize(),
                 entity::getChildCountAvailable,
                 entity.getChildContainerCount());
     }
