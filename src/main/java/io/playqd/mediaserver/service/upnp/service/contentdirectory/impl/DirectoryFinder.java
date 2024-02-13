@@ -26,8 +26,10 @@ import org.jupnp.util.MimeType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.ScrollPosition;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -72,11 +74,11 @@ final class DirectoryFinder extends BrowsableObjectBuilder implements ObjectBrow
   private int createChildrenObjects(PersistedBrowsableObject parent) {
     var directoryItems = (Page<DirectoryItem>) null;
     if (parent.isRoot()) {
-      directoryItems = mediaLibraryClient.musicDirectoryTree(Long.parseLong(parent.location().toString()));
+      directoryItems = mediaLibraryClient.musicDirectoryTree(Long.parseLong(parent.location()));
     } else {
       var musicDirectoryId = getObjectSourceDirId(parent);
       var pathBase64Encoded = Base64.getEncoder().encodeToString(
-          parent.location().toString().getBytes(StandardCharsets.UTF_8));
+          parent.location().getBytes(StandardCharsets.UTF_8));
       directoryItems = mediaLibraryClient.musicDirectoryTree(musicDirectoryId, pathBase64Encoded);
     }
     var objectSetters =  directoryItems.stream()
@@ -97,19 +99,17 @@ final class DirectoryFinder extends BrowsableObjectBuilder implements ObjectBrow
     if (startingIndex > totalCount) {
       return BrowseResult.empty();
     } else if (startingIndex > 0) {
-      var pageRequest = PageRequest.of(0, totalCount + 1, Sort.by(Sort.Order.by("dcTitle")));
-      var children = browsableObjectDao.getChildren(parentId, pageRequest);
-      var childrenOffset = children.stream().skip(startingIndex).toList();
-
-      var result = buildBrowsableObjects(
-          browseRequest, parentObject, childrenOffset.stream().limit(requestedCount).toList());
-
-      return new BrowseResult(childrenOffset.size(), result.size(), result);
-    } else {
-      var pageRequest = PageRequest.of(0, requestedCount, Sort.by(Sort.Order.by("dcTitle")));
+      var window = browsableObjectDao.getChildren(parentId, ScrollPosition.offset(startingIndex));
+      var result = buildBrowsableObjects(browseRequest, parentObject, window.getContent());
+      return new BrowseResult(window.size(), result.size(), result);
+    } else { // first page, startingIdx is 0
+      var orders = List.of(
+          new Sort.Order(Sort.Direction.DESC, "upnpClass"),
+          new Sort.Order(Sort.Direction.ASC, "dcTitle").ignoreCase());
+      var pageRequest = PageRequest.of(0, requestedCount, Sort.by(orders));
       var page = browsableObjectDao.getChildren(parentId, pageRequest);
       var result = buildBrowsableObjects(browseRequest, parentObject, page.getContent());
-      return new BrowseResult(page.getSize(), page.getSize(), result);
+      return new BrowseResult(page.getTotalElements(), result.size(), result);
     }
   }
 
@@ -145,16 +145,19 @@ final class DirectoryFinder extends BrowsableObjectBuilder implements ObjectBrow
   private List<BrowsableObject> buildAudioTrackObjectItems(Browse browseRequest,
                                                            PersistedBrowsableObject parentObject,
                                                            List<PersistedBrowsableObject> audioFilesPersistedObjects) {
+    if (CollectionUtils.isEmpty(audioFilesPersistedObjects)) {
+      return Collections.emptyList();
+    }
     var musicDirectoryId = getObjectSourceDirId(parentObject);
     Page<Track> tracks;
     if (parentObject.isRoot()) {
       tracks = mediaLibraryClient.tracksByLocation(Pageable.unpaged(), musicDirectoryId, "");
     } else {
       tracks = mediaLibraryClient.tracksByLocation(
-          Pageable.unpaged(), musicDirectoryId, parentObject.location().toString());
+          Pageable.unpaged(), musicDirectoryId, parentObject.location());
     }
     var locationToObjectMap = audioFilesPersistedObjects.stream()
-        .collect(Collectors.toMap(obj -> obj.location().toString(), obj -> obj));
+        .collect(Collectors.toMap(PersistedBrowsableObject::location, obj -> obj));
     return tracks.stream()
         .map(track -> buildAudioTrackObjectItem(
             browseRequest,
@@ -165,7 +168,7 @@ final class DirectoryFinder extends BrowsableObjectBuilder implements ObjectBrow
 
   private long getObjectSourceDirId(PersistedBrowsableObject browsableObject) {
     var rootObject = browsableObjectDao.getChildRoot(browsableObject);
-    return Long.parseLong(rootObject.location().toString());
+    return Long.parseLong(rootObject.location());
   }
 
   private Consumer<BrowsableObjectSetter> toBrowsableObjectSetter(DirectoryItem directoryItem) {
@@ -242,9 +245,9 @@ final class DirectoryFinder extends BrowsableObjectBuilder implements ObjectBrow
         .resources(List.of(
             ResTag.builder()
                 .id(Long.toString(object.id()))
-                .uri(mediaLibraryResourceUriBuilder.getImageBinaryResourceForLocation(object.location().toString()))
-                .protocolInfo(DlnaUtils.buildImageProtocolInfo(new MimeType()))
-                .size("")
+                .uri(mediaLibraryResourceUriBuilder.getImageBinaryResourceForLocation(object.location()))
+                .protocolInfo(DlnaUtils.buildImageProtocolInfo(MimeType.valueOf(object.mimeType())))
+                .size(object.size() != null ? object.size().toString() : "")
                 .image(true)
                 .build()))
         .build();

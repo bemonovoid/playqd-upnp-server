@@ -40,13 +40,13 @@ public class BrowsableObjectEntity extends PersistableAuditableEntity implements
     private static final String COL_CHILD_COUNT = "child_count";
     private static final String COL_CHILD_CONTAINER_COUNT = "child_container_count";
 
-    @Column(name = COL_OBJECT_ID, nullable = false)
+    @Column(name = COL_OBJECT_ID, nullable = false, unique = true)
     private String objectId;
 
     @Column(name = COL_TITLE, nullable = false)
     private String dcTitle;
 
-    @Column(name = COL_LOCATION, nullable = false)
+    @Column(name = COL_LOCATION, nullable = false, unique = true)
     private String location;
 
     @Column(name = COL_UPNP_CLASS, nullable = false)
@@ -71,11 +71,7 @@ public class BrowsableObjectEntity extends PersistableAuditableEntity implements
     @ManyToOne(fetch = FetchType.LAZY)
     private BrowsableObjectEntity parent;
 
-    @OneToMany(
-            mappedBy = "parent",
-            fetch = FetchType.LAZY,
-            cascade = { CascadeType.ALL}
-    )
+    @OneToMany(mappedBy = "parent", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<BrowsableObjectEntity> children;
 
     public final long getChildCountAvailable() {

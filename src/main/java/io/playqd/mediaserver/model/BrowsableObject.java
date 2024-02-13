@@ -45,14 +45,6 @@ public interface BrowsableObject {
         return 0;
     }
 
-    default boolean isVirtual() {
-        return false;
-    }
-
-    default boolean isVirtualRoot() {
-        return isRoot() && isVirtual();
-    }
-
     default String getParentObjectId() {
         return null;
     }

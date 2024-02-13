@@ -1,10 +1,8 @@
 package io.playqd.mediaserver.service.upnp.service;
 
 import io.playqd.mediaserver.exception.PlayqdException;
-import io.playqd.mediaserver.model.event.AudioFileByteStreamRequestedEvent;
 import io.playqd.mediaserver.persistence.StateVariableDao;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
@@ -53,11 +51,6 @@ class StateVariableContextHolderImpl implements StateVariableContextHolder {
     @Override
     public <T extends Serializable> void set(StateVariableName stateVariable, T newValue) {
         stateVariableDao.set(stateVariable, newValue);
-    }
-
-    @EventListener(AudioFileByteStreamRequestedEvent.class)
-    public void handleAudioFileByteStreamRequestedEvent(AudioFileByteStreamRequestedEvent event) {
-        updateSystemUpdateId();
     }
 
     private void updateSystemUpdateId() {

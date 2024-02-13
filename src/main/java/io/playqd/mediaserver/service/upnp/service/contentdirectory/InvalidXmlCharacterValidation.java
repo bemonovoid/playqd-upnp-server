@@ -18,11 +18,9 @@ class InvalidXmlCharacterValidation implements BrowsableObjectValidation {
 
     @Override
     public boolean isValid(Source source) {
-        log.info("Validating source ...");
         try {
             var writer = new StringWriter();
             transformer.transform(source, new StreamResult(writer));
-            log.info("Source is valid.");
             return true;
         } catch (TransformerException e) {
             if (e.getMessage().contains("An invalid XML character")) {

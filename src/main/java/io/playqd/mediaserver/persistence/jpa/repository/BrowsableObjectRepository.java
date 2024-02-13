@@ -4,6 +4,8 @@ import io.playqd.mediaserver.exception.DatabaseEntityNotFoundException;
 import io.playqd.mediaserver.persistence.jpa.entity.BrowsableObjectEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.ScrollPosition;
+import org.springframework.data.domain.Window;
 
 import java.util.List;
 import java.util.Optional;
@@ -31,4 +33,6 @@ public interface BrowsableObjectRepository extends IdentityJpaRepository<Browsab
 
     Page<BrowsableObjectEntity> findAllByParentId(long parentId, Pageable pageable);
 
+    Window<BrowsableObjectEntity> findAllByParentIdOrderByUpnpClassDescDcTitleAsc(long parentId,
+                                                                                  ScrollPosition scrollPosition);
 }

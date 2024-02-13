@@ -4,6 +4,8 @@ import io.playqd.mediaserver.persistence.jpa.dao.BrowsableObjectSetter;
 import io.playqd.mediaserver.persistence.jpa.dao.PersistedBrowsableObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.ScrollPosition;
+import org.springframework.data.domain.Window;
 
 import java.util.List;
 import java.util.Optional;
@@ -24,6 +26,8 @@ public interface BrowsableObjectDao {
   List<PersistedBrowsableObject> getRoots();
 
   Page<PersistedBrowsableObject> getChildren(long parentId, PageRequest request);
+
+  Window<PersistedBrowsableObject> getChildren(long parentId, ScrollPosition scrollPosition);
 
   PersistedBrowsableObject save(Consumer<BrowsableObjectSetter> consumer);
 

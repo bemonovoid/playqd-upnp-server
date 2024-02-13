@@ -6,11 +6,12 @@ import io.playqd.mediaserver.persistence.jpa.repository.BrowsableObjectRepositor
 import io.playqd.mediaserver.service.upnp.server.UUIDV3Ids;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.ScrollPosition;
+import org.springframework.data.domain.Window;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -71,6 +72,13 @@ class JpaBrowsableObjectDao implements BrowsableObjectDao {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public Window<PersistedBrowsableObject> getChildren(long parentId, ScrollPosition scrollPosition) {
+        return repository.findAllByParentIdOrderByUpnpClassDescDcTitleAsc(parentId, scrollPosition)
+            .map(JpaBrowsableObjectDao::fromEntity);
+    }
+
+    @Override
     public PersistedBrowsableObject save(Consumer<BrowsableObjectSetter> consumer) {
         var entity = new BrowsableObjectEntity();
         consumer.accept(entity);
@@ -114,7 +122,7 @@ class JpaBrowsableObjectDao implements BrowsableObjectDao {
                 entity.getParentId(),
                 entity.getObjectId(),
                 entity.getDcTitle(),
-                Paths.get(entity.getLocation()),
+                entity.getLocation(),
                 entity.getUpnpClass(),
                 entity.getMimeType(),
                 entity.getSize(),

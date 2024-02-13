@@ -2,8 +2,8 @@ package io.playqd.mediaserver.service.upnp.service.contentdirectory.impl;
 
 import io.playqd.mediaserver.model.BrowsableObject;
 import io.playqd.mediaserver.service.upnp.service.contentdirectory.DcTagValues;
-import io.playqd.mediaserver.service.upnp.service.contentdirectory.UpnpTagValues;
 import io.playqd.mediaserver.service.upnp.service.contentdirectory.ResTag;
+import io.playqd.mediaserver.service.upnp.service.contentdirectory.UpnpTagValues;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -38,12 +38,4 @@ public class BrowsableObjectImpl implements BrowsableObject {
     public final Long getId() {
         return null;
     }
-
-    //TODO remove
-    @Override
-    public final boolean isVirtual() {
-        return false;
-    }
-
 }
-

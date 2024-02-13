@@ -78,13 +78,12 @@ final class MusicDirectoriesFinder extends BrowsableObjectBuilder implements Obj
         .childContainerCount(persistedObject.childContainerCount())
         .dc(buildDcTagValues(persistedObject))
         .upnp(buildUpnpTagValues())
+        .searchable(true)
         .build();
   }
 
   private static DcTagValues buildDcTagValues(PersistedBrowsableObject source) {
-    return DcTagValues.builder()
-        .title(source.dcTitle())
-        .build();
+    return DcTagValues.builder().title(source.dcTitle()).build();
   }
 
   private static UpnpTagValues buildUpnpTagValues() {
